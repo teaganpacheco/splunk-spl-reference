@@ -1,0 +1,11 @@
+earliest=-24h
+index=_internal
+sourcetype=splunkd
+group=tcpin_connections
+| eval source_host=coalesce(hostname, sourceHost)
+| stats
+    latest(version) AS version
+    latest(sourceIp) AS source_ip
+    latest(fwdType) AS forwarder_type
+    by source_host
+| sort source_host

@@ -679,23 +679,6 @@ Use appropriate caution with searches that interact with large datasets, REST en
 
 ---
 
-# License
-
-Choose an appropriate open-source license before making the repository public.
-
-For a general-purpose reference repository, commonly considered options include:
-
-* MIT License
-* Apache License 2.0
-
-The selected license should be added as:
-
-```text
-LICENSE
-```
-
----
-
 # Roadmap
 
 Planned work:
