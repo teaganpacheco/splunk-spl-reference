@@ -1,0 +1,3 @@
+| metasearch index=*
+| stats earliest(_time) AS Earliest_Time
+| eval Earliest_Time=strftime(Earliest_Time,"%Y-%m-%d %H:%M:%S")

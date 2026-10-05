@@ -1,0 +1,23 @@
+| rest /services/data/indexes-extended splunk_server=*
+| rename title as index
+| search index=*
+| fields splunk_server index totalEventCount currentDBSizeMB homePath.maxDataSizeMB coldPath.maxDataSizeMB frozenTimePeriodInSecs maxTotalDataSizeMB bucket_dirs.home.warm_bucket_size bucket_dirs.cold.bucket_size minTime
+| rename homePath.maxDataSizeMB as hpmds, coldPath.maxDataSizeMB as cpmds, bucket_dirs.cold.bucket_size as cold_size, bucket_dirs.home.warm_bucket_size as warm_size
+| join splunk_server [
+    | rest /services/server/roles
+    | fields splunk_server role_list
+    | eval role_list=if(match(role_list,"indexer"),1,0)
+]
+| search role_list=1
+| eval cold_size=if(isnull(cold_size),"0",cold_size), warm_size=if(isnull(warm_size),"0",warm_size), total_size=(cold_size+warm_size)
+| eval time_to_frozen=(frozenTimePeriodInSecs/60/60/24/30.437), time_to_frozen=if(time_to_frozen>12,ROUND(time_to_frozen,0)." Months",ROUND(time_to_frozen,1)." Months")
+| eval round="0"
+| eval cold_limit=if(cpmds=="0","0 (Unlimited)",ROUND(cpmds/1024,round)." GB"), warm_limit=if(hpmds=="0","0 (Unlimited)",ROUND(hpmds/1024,round)." GB"), size_limit=if(maxTotalDataSizeMB=="0","0 (Unlimited)",ROUND(maxTotalDataSizeMB/1024,round)." GB")
+| eval minTime_epoch=strptime('minTime',"%Y-%m-%dT%H:%M:%S%z")
+| fields - minTime
+| stats min(minTime_epoch) as minTime_epoch count(role_list) as peer_count values(splunk_server) as splunk_servers sum(totalEventCount) as totalEventCount sum(total_size) as total_size sum(warm_size) as warm_size sum(cold_size) as cold_size values(round) as round by index time_to_frozen size_limit warm_limit cold_limit
+| eval avg_cold_size=ROUND(((cold_size/1024)/peer_count),round)." GB", avg_warm_size=ROUND(((warm_size/1024)/peer_count),round)." GB", avg_total_size=ROUND(((total_size/1024)/peer_count),round)." GB"
+| eval total_event_count=tostring(totalEventCount,"commas")." Events"
+| eval earliest_event=((now()-minTime_epoch)/60/60/24/30.437), earliest_event=if(earliest_event>12,ROUND(earliest_event,0)." Months ago",ROUND(earliest_event,1)." Months ago")
+| table index total_event_count earliest_event time_to_frozen avg_total_size size_limit avg_warm_size warm_limit avg_cold_size cold_limit
+| sort 0 - avg_total_size

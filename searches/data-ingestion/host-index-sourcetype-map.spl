@@ -1,0 +1,3 @@
+| tstats count where earliest=@d latest=now index=* sourcetype=* host=* splunk_server=* by host splunk_server index sourcetype
+| eval uid=index." - ".sourcetype
+| stats sum(count) as count values(uid) as uid by host

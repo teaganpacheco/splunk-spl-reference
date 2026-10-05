@@ -1,0 +1,2 @@
+| tstats count where earliest=@d latest=now index=* sourcetype=* by _time host sourcetype span=30m@m
+| timechart span=30m@m sum(count) by sourcetype

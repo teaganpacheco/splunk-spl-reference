@@ -1,0 +1,4 @@
+| dbinspect index=*
+| eval GB=round(sizeOnDiskMB/1024,2)
+| stats sum(GB) as sizeOnDiskGB by index
+| sort - sizeOnDiskGB

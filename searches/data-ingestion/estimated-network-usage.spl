@@ -1,0 +1,7 @@
+earliest=-1h@h latest=@h index=* sourcetype=* tag=*
+| eval dat=len(_raw)
+| bin _time span=1m
+| stats sum(dat) as bytes by _time
+| eval bits=((round(bytes*8,2))/60)
+| eval megabits=(round(bits/1024/1024,2))
+| fields _time bits megabits

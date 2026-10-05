@@ -1,0 +1,8 @@
+| datamodel
+| rex field=_raw "\"modelName\"\s*\:\s*\"(?<modelName>[^\"]+)\""
+| search modelName IN ("Authentication","Change Analysis","Intrusion Detection","Malware","Alerts","Inventory","Data Loss Prevention","Email","Endpoint","Network Resolution","Network Session","Network Traffic","Performance","Splunk Audit Logs","Updates","Vulnerabilities","Web")
+| fields modelName
+| table modelName
+| map maxsearches=40 search="tstats summariesonly=true count from datamodel=$modelName$ by index, sourcetype | eval modelName=\"$modelName$\""
+| table modelName index sourcetype
+| stats values(index) as index, values(sourcetype) as sourcetype by modelName

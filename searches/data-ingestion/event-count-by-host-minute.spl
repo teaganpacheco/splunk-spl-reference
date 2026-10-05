@@ -1,0 +1,3 @@
+| tstats count by _time span=1m host
+| eventstats sum(count) as Total by _time
+| search host=*

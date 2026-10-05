@@ -1,0 +1,15 @@
+earliest=-30d@d latest=@d index=_internal source=*license_usage.log type=RolloverSummary splunk_server=*
+| eval _time=_time - 43200
+| bin _time span=1d
+| stats latest(b) AS b by slave pool _time
+| timechart span=1d sum(b) AS volume fixedrange=false
+| join type=outer _time [
+    search index=_internal source=*license_usage.log type=RolloverSummary splunk_server=* earliest=-30d@d
+    | eval _time=_time - 43200
+    | bin _time span=1d
+    | stats latest(stacksz) AS "stack size" by _time
+]
+| fields - _timediff
+| foreach * [
+    eval <<FIELD>>=round('<<FIELD>>'/1024/1024/1024,3)
+]

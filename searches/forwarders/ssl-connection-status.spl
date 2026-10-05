@@ -1,0 +1,3 @@
+earliest=@d latest=now index=_internal source=*metrics.log* group=tcpin_connections
+| dedup hostname
+| table _time hostname version sourceIp destPort ssl

@@ -1,0 +1,2 @@
+| tstats dc(host) where earliest=-1d@d latest=@d index=* by index
+| sort - dc(host)

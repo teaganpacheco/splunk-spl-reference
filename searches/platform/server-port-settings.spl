@@ -1,0 +1,2 @@
+| rest /services/server/settings
+| fields *Port *port

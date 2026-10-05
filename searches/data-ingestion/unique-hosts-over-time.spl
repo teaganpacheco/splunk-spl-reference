@@ -1,0 +1,2 @@
+| tstats prestats=f count where earliest=@mon latest=now index=* sourcetype=* by _time host
+| timechart span=1d dc(host) as hostCount

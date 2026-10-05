@@ -1,0 +1,4 @@
+| rest /services/authentication/users splunk_server=local
+| fields title roles realname
+| rename title as username
+| rename realname as Name

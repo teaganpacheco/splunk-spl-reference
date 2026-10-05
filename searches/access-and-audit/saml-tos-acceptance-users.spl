@@ -1,0 +1,10 @@
+earliest=@d latest=now index=_internal host=* tag=* component=UiSAML "TOS needs to be accepted by the user"
+| rex field=_raw "user\.(?<user>.+)$"
+| table _time user
+| sort - _time
+| join left=L right=R where L.user=R.title [
+    | rest /services/authentication/users splunk_server=local
+    | table title realname
+]
+| table _time L.user R.realname
+| rename L.user AS "User Name", R.realname AS "Display Name"
