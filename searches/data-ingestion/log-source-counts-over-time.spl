@@ -1,0 +1,2 @@
+| tstats prestats=t count where earliest=@d latest=now index=* sourcetype=* by _time sourcetype span=30m@m
+| timechart span=30m@m count by sourcetype useother=t limit=20

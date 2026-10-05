@@ -1,0 +1,3 @@
+earliest=@d latest=now index=_internal ((*phonehome* component=DC*) OR component=DC:HandshakeReplyHandler) host=<hostname>
+| sort _time
+| table _time host log_level message

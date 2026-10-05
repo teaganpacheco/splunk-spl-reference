@@ -1,0 +1,1 @@
+| tstats summariesonly=true values(sourcetype) as sourcetype where earliest=@d latest=now index=* by index

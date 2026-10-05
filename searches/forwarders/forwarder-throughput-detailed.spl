@@ -1,0 +1,16 @@
+earliest=@d latest=now index=_internal source=*metrics.log group=tcpin_connections splunk_server=*
+| eval host=if(isnull(hostname), sourceHost, hostname)
+| search host=* host!="(ALL)"
+| eval connectionType=case(fwdType=="uf","univ fwder", fwdType=="lwf","lightwt fwder", fwdType=="full","heavy fwder", connectionType=="cooked" OR connectionType=="cookedSSL","Splunk fwder", connectionType=="raw" OR connectionType=="rawSSL","old fwder")
+| eval Ver=if(isnull(version),"pre 4.2",version)
+| fields connectionType sourceIp host kb tcp_eps tcp_KBps splunk_server Ver
+| stats min(_time) as first_time max(_time) as last_time max(tcp_KBps) as max_tcp_KBps avg(tcp_KBps) as avg_tcp_KBps avg(tcp_eps) as avg_tcp_eps sum(kb) as sum_kb by host sourceIp Ver
+| dedup host
+| eval sum_mb=round(sum_kb/1024, 0)
+| fields - sum_kb
+| eval avg_tcp_KBps=round(avg_tcp_KBps, 0)
+| eval max_tcp_KBps=round(max_tcp_KBps, 0)
+| eval class=case(avg_tcp_KBps>0 AND avg_tcp_KBps<=128,"Standard Hosts", avg_tcp_KBps>128 AND avg_tcp_KBps<=256,"Better Hosts", avg_tcp_KBps>256,"Special Hosts")
+| convert ctime(*time)
+| rename first_time as "First seen", last_time as "Last seen", avg_tcp_KBps as "AVG KB/s", avg_tcp_eps as "AVG Events/s per 30 seconds", sum_mb as "Total MB", max_tcp_KBps as "Peak Kbps", connectionType as "Forwarder Type", sourceIp as "Source IP", host as "Host", Ver as "Splunk Version"
+| sort - "Peak Kbps"

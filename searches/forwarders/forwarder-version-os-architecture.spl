@@ -1,0 +1,4 @@
+earliest=@d latest=now index=_internal source=*metrics.log group=tcpin_connections hostname=* splunk_server=*
+| dedup sourceIp
+| sort sourceIp
+| table hostname sourceIp fwdType version os arch

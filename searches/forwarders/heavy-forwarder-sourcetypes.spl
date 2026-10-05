@@ -1,0 +1,2 @@
+earliest=@d latest=now index=_internal sourcetype=splunkd host=<heavy_forwarder> group=per_sourcetype_thruput
+| stats values(series) by host
