@@ -1,0 +1,6 @@
+| rest splunk_server=local /servicesNS/-/-/saved/searches
+| search is_scheduled=1 disabled=0
+| search title="<saved_search_title>"
+| fields title eai:acl.app search datamodel index
+| rex field=search "from datamodel[:=]\"?(?<datamodel>\w+)"
+| rex field=search "^index=\W?(?<index>\w+)"

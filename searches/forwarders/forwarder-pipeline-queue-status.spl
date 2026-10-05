@@ -1,0 +1,10 @@
+earliest=-5m@m latest=now index=_internal sourcetype=splunkd component=Metrics group=queue name=tcpout_intfwd host=<host>
+| stats latest(current_size) as current_size latest(max_size) as max_size by host name
+| eval percent_full=round((current_size/max_size)*100,2)
+| eval status=case(
+    percent_full>=90,"High Backlog",
+    percent_full>=60,"Moderate Backlog",
+    percent_full<60,"Low/Normal"
+)
+| table host name current_size max_size percent_full status
+| sort - percent_full

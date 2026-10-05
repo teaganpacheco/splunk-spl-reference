@@ -1,0 +1,4 @@
+index=<unix_index> eventtype=failed_login user!=UNKNOWN_USER
+| eval devices=coalesce(src_ip,src_computer,src)
+| stats values(devices) as devices, count by host user
+| sort - count

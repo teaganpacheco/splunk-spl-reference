@@ -1,0 +1,3 @@
+earliest=@week latest=now index=<index_1> OR index=<index_2>
+| stats dc(index) as indexes_reporting values(index) as index_names by host
+| where indexes_reporting=1

@@ -1,0 +1,13 @@
+| rest splunk_server=local /services/search/distributed/peers
+| rename title as peerURI
+| join type=outer peerURI [
+    | rest splunk_server=local /services/server/info
+    | eval peerURI="localhost"
+    | eval status="Up"
+]
+| eval status=if(status=="Up",status,"Unreachable")
+| eval OS=os_name
+| eval ram=round(physicalMemoryMB/1024,2)." GB"
+| fields host server_roles OS numberOfCores ram version status
+| sort status host
+| rename host as Instance, server_roles as Role, numberOfCores as Cores, ram as RAM, version as Version, status as Status

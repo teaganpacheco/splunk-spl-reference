@@ -1,0 +1,6 @@
+earliest=-1h@h latest=now index=<unix_index> sourcetype=df host=<host> mount="<mount_point>"
+| stats latest(Size) as Size, latest(Used) as Used, latest(Avail) as Avail by host
+| eval rawSize=rtrim(replace(Size,"T",""))
+| eval rawUsed=rtrim(replace(Used,"T",""))
+| eval rawAvail=rtrim(replace(Avail,"T",""))
+| addtotals row=f col=t fieldname=totals

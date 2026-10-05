@@ -1,0 +1,2 @@
+| tstats summariesonly=true values(source) as source where earliest=@h latest=now index=* sourcetype=* source=* by index sourcetype
+| eval source=mvindex(source,0,10)

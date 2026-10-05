@@ -1,0 +1,4 @@
+earliest=@d latest=now index=_internal source=*metrics.log* host=<indexer>
+| search group=queue name IN (parsingQueue,aggQueue,typingQueue,indexQueue)
+| eval pct=round(100*current_size_kb/max_size_kb,1)
+| timechart max(pct) by name

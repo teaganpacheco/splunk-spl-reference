@@ -1,0 +1,7 @@
+| rest splunk_server=local /services/saved/searches
+| rename eai:acl.app as app, title as saved_search_name
+| table saved_search_name description author cron_schedule action.notable.param.severity action.notable.param.security_domain dispatch.earliest_time action.notable updated
+| eval lastday=relative_time(now(),"-24h")
+| eval updated_epoch=strptime(updated,"%Y-%m-%dT%H:%M:%S%z")
+| where updated_epoch>=lastday
+| sort - updated
