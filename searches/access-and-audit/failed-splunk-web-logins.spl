@@ -1,0 +1,5 @@
+index=_internal sourcetype=splunkd log_level=ERROR component=UiAuth clientip=* user=* host=*
+| eval action=action." ".status
+| stats latest(_time) as _time, count by user clientip action reason
+| rename user as "User ID", clientip as "Client IP Address", action as Action, _time as Time, reason as Reason
+| where count>2

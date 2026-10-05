@@ -1,0 +1,2 @@
+| tstats summariesonly=true count where index=* sourcetype=* source=* host=* index!=*_summary by index sourcetype
+| stats count as total_unique_combinations

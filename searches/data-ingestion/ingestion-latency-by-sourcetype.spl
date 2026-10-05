@@ -1,0 +1,7 @@
+| tstats count where earliest=@d latest=now index=* by sourcetype _time _indextime span=1s
+| eval time=_time
+| eval indexTime=_indextime
+| eval latency=round((indexTime-time)/60,2)
+| stats perc95(latency) as latency_95, max(latency) as latency_max, min(latency) as latency_min by sourcetype
+| sort - latency_95
+| rename latency_95 as "latency_95 (mins)", latency_max as "latency_max (mins)", latency_min as "latency_min (mins)"

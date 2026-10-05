@@ -1,0 +1,4 @@
+| rest /services/apps/local splunk_server=*
+| search disabled=0 core=0
+| fields title label version splunk_server
+| stats values(title) as title, values(label) as label, values(version) as version by splunk_server

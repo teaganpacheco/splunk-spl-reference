@@ -1,0 +1,2 @@
+| inputlookup <lookup_name>.csv
+| search ip="<ip_address>"

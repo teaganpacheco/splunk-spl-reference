@@ -1,0 +1,3 @@
+| rest /services/deployment/server/applications splunk_server=local
+| where isnull(serverclasses)
+| table title

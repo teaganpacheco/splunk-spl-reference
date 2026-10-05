@@ -1,0 +1,4 @@
+earliest=@d latest=now index=_internal host=<host> source=*metrics.log* (group=tcpout OR group=tcpout_connections OR group=queue)
+| eval pct=round(100*current_size_kb/max_size_kb,1)
+| where isnotnull(group) OR name="tcpout"
+| timechart max(pct) as tcpout_queue_pct max(kbps) as send_kbps by group limit=0

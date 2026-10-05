@@ -1,0 +1,12 @@
+| rest /services/apps/local splunk_server=local
+| search disabled=0 core=0 label!=100-* label!=075-* label!=100_*
+| dedup label
+| rename update.version AS updateversion
+| eval updateversion=case(
+    isnull(updateversion) AND check_for_updates=1,"No Update Available",
+    isnull(updateversion) AND check_for_updates=0,"Update Checking Disabled",
+    isnotnull(updateversion) AND check_for_updates=1,"Update Available - ".updateversion
+)
+| table label description version updateversion build splunk_server
+| rename label AS AppName, version AS CurrentVersion, updateversion AS UpdateAvailable
+| search UpdateAvailable="Update Available*"

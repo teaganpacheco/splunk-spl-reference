@@ -1,0 +1,6 @@
+earliest=@d latest=now index=_internal source="*license_usage.log" type=Usage s=*
+| eval MB=b/1048576
+| stats sum(MB) as sum_MB by s
+| eval sum_MB=round(sum_MB,2)
+| rename s as source
+| sort - sum_MB
