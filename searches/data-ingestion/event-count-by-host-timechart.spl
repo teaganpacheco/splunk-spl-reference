@@ -1,0 +1,2 @@
+earliest=@d latest=now index=* sourcetype=* host=*
+| timechart span=15min count by host

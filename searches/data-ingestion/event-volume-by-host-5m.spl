@@ -1,0 +1,2 @@
+| tstats count where earliest=@d latest=now index=* source="*" splunk_server=* by index host _time span=5m
+| chart sum(count) as count over _time by host

@@ -1,0 +1,2 @@
+earliest=@d latest=now index=_internal sourcetype=splunkd host=* group=per_sourcetype_thruput splunk_server=* series=*
+| stats values(host) by series

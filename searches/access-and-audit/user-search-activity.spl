@@ -1,0 +1,5 @@
+index=_audit action=search info=granted search=* NOT "search_id='scheduler" NOT "search='|history" NOT "user=splunk-system-user" NOT "search='typeahead" NOT "search='| metadata type=* | search totalCount>0"
+| stats count by user search _time
+| sort _time
+| convert ctime(_time)
+| stats list(_time) as time list(search) as search by user

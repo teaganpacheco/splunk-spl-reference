@@ -1,0 +1,2 @@
+earliest=@d latest=now index=_internal sourcetype=scheduler host=*
+| table _time user savedsearch_name status scheduled_time run_time result_count host

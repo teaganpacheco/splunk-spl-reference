@@ -1,0 +1,3 @@
+earliest=-30d@d latest=@d index=_internal source=*license_usage.log type="RolloverSummary"
+| timechart span=1d sum(b) AS License_Usage
+| eval License_Usage=round(License_Usage/1024/1024/1024,2)

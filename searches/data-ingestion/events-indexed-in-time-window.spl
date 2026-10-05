@@ -1,0 +1,2 @@
+| tstats prestats=t count where index=<index> sourcetype=* _index_earliest=-48h _index_latest=-12h earliest=-3y latest=+1w by _time index span=1d
+| timechart span=1d count by index

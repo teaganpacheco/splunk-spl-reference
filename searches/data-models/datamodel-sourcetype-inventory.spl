@@ -1,0 +1,1 @@
+| tstats values(sourcetype) as sourcetype from datamodel=Authentication where earliest=-1h@h latest=@h splunk_server=* by index

@@ -1,0 +1,13 @@
+index=_internal sourcetype=splunkd "has reached maxKBps"
+| rex "Current data throughput \((?<kb>\S+)"
+| eval throughput=case(
+    kb<500,"256",
+    kb>499 AND kb<520,"512",
+    kb>520 AND kb<770,"768",
+    kb>771 AND kb<1210,"1024",
+    1=1,">1024"
+)
+| stats count as Count sparkline as Trend by host throughput
+| where Count>=1
+| rename host as "Host", throughput as "Throughput rate(kb)", count as "Hit Count"
+| sort -"Throughput rate(kb)", -Count

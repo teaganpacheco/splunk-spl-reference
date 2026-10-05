@@ -1,0 +1,8 @@
+earliest=@d latest=now index=_audit splunk_server=*
+[
+    search index=_internal source="*web_access.log" user!="-" splunk_server=* earliest=@d latest=now
+    | stats by user
+    | fields user
+]
+| search action="search" OR action="rtsearch"
+| stats values(action) as Action, values(info) as Info, max(timestamp) as lastTime, min(timestamp) as firstTime by user

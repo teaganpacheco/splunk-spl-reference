@@ -1,0 +1,6 @@
+| tstats count as COUNT where index=* earliest=@d latest=@h by _time
+| eval tnow=now()
+| convert timeformat="%H" ctime(tnow)
+| eval eps=COUNT/60/60/tnow
+| stats sum(eps) AS avgEPS
+| fields avgEPS

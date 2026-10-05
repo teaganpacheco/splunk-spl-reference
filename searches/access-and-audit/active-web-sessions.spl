@@ -1,0 +1,2 @@
+| rest /services/authentication/httpauth-tokens/
+| stats max(timeAccessed) by userName

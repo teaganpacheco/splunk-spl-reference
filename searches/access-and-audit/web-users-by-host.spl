@@ -1,0 +1,2 @@
+earliest=@d latest=now index=_internal host=<hostname> source="*web_access.log"
+| top user
