@@ -1,0 +1,7 @@
+earliest=@d latest=now index=_internal source=*metrics.log group=tcpin_connections
+| where isnotnull(fwdType)
+| eval sourceHost=if(isnull(hostname), sourceHost, hostname)
+| dedup sourceHost
+| eval connectionType=case(fwdType=="uf","Universal", fwdType=="lwf","Lightweight", fwdType=="full","Heavy")
+| rename sourceIp as "Source IP", sourceHost as "Source Host", connectionType as "Forwarder Type"
+| table "Source IP" "Source Host" "Forwarder Type"

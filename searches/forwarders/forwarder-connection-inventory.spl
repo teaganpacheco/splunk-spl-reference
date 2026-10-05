@@ -1,0 +1,6 @@
+earliest=@d latest=now index=_internal source=*metrics.log group=tcpin_connections
+| eval sourceHost=if(isnull(hostname), sourceHost, hostname)
+| dedup sourceHost
+| eval connectionType=case(fwdType=="uf","univ fwder", fwdType=="lwf","lightwt fwder", fwdType=="full","heavy fwder", connectionType=="cooked" OR connectionType=="cookedSSL","Splunk fwder", connectionType=="raw" OR connectionType=="rawSSL","old fwder")
+| eval version=if(isnull(version),"pre 4.2",version)
+| table connectionType sourceIp sourceHost destPort version

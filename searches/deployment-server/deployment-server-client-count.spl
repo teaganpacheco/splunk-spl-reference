@@ -1,0 +1,4 @@
+earliest=@d latest=now index=_internal sourcetype=splunkd component=PubSubSvr splunk_server=*
+| rex field=channel "\/handshake\/reply\/(?P<DeploymentClient>[^\/]+)"
+| rename host as DeploymentServer
+| stats dc(DeploymentClient) by DeploymentServer

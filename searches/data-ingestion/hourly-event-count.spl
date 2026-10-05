@@ -1,0 +1,4 @@
+earliest=-1d@d latest=@d index=* sourcetype=*
+| bucket _time span=1h
+| stats count by _time
+| sort - count

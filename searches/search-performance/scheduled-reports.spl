@@ -1,0 +1,3 @@
+| rest /servicesNS/-/-/saved/searches
+| search is_scheduled=1
+| table author cron_schedule is_scheduled schedule_window title updated embed.enabled Search

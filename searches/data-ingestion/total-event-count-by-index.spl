@@ -1,0 +1,4 @@
+| eventcount summarize=false index=*
+| stats sum(count) as count by index
+| sort - count
+| eval count=tostring(count, "commas")

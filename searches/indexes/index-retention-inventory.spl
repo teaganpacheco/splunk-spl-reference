@@ -1,0 +1,7 @@
+| rest /services/data/indexes
+| where disabled=0
+| search NOT title="_*"
+| eval currentDBSizeGB=round(currentDBSizeMB/1024)
+| where currentDBSizeGB>0
+| table splunk_server title summaryHomePath_expanded minTime maxTime currentDBSizeGB totalEventCount frozenTimePeriodInSecs coldToFrozenDir maxTotalDataSizeMB
+| rename minTime as earliest, maxTime as latest, summaryHomePath_expanded as index_path, currentDBSizeGB as index_size, totalEventCount as event_cnt, frozenTimePeriodInSecs as index_retention, coldToFrozenDir as index_path_frozen, maxTotalDataSizeMB as index_size_max, title as index

@@ -1,0 +1,2 @@
+| tstats count where earliest=@d latest=now index=* by index _time span=1d prestats=t
+| timechart span=1d count by index

@@ -1,0 +1,1 @@
+| tstats values(sourcetype) where earliest=@d latest=now index=*

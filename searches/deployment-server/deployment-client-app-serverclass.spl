@@ -1,0 +1,3 @@
+| rest /services/deployment/server/clients splunk_server=local
+| table hostname applications.*.serverclasses
+| untable hostname applications serverclass

@@ -1,0 +1,10 @@
+| tstats count where earliest=@d latest=now index=* by _time _indextime sourcetype span=1s
+| search sourcetype!=*too_small*
+| rex field=sourcetype "^(?<st>.+?)([\-\d]*)$"
+| eval tdiff=((_indextime-_time)*count)
+| stats sum(tdiff) as s sum(count) as c by st
+| eval lm=round(((s/c)/60), 0)
+| search lm > 30
+| fields st lm
+| rename lm as "Avg Latency(Minutes)"
+| sort - "Avg Latency(Minutes)"

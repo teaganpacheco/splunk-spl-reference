@@ -1,0 +1,6 @@
+| tstats count where earliest=@d latest=now index=_* sourcetype=* host!=*.splunkcloud.com by index sourcetype host _time _indextime
+| eval indextime=_indextime, time=_time, deltatimemins=round((_indextime-_time)/60, 1), internal=if(match(index, "^_"), 1, 0)
+| stats avg(deltatimemins) as deltatimemins by index host
+| eval deltatimemins=round(deltatimemins, 1)
+| sort - deltatimemins
+| eval latency=case(deltatimemins<=1, "Very Slight", deltatimemins<=5, "Slight", deltatimemins>5, "High")

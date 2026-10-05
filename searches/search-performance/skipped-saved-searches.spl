@@ -1,0 +1,2 @@
+earliest=@d latest=now index=_internal sourcetype=scheduler savedsearch_name=* status=skipped
+| stats count by savedsearch_name reason

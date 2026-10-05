@@ -1,0 +1,2 @@
+earliest=@d latest=now index=_introspection host=* source=*/resource_usage.log* component=PerProcess data.process_type="search"
+| stats latest(data.pct_cpu) as resource_usage_cpu latest(data.mem_used) as resource_usage_mem by data.pid _time data.search_props.type data.search_props.mode data.search_props.role data.search_props.user data.search_props.app data.search_props.sid

@@ -1,0 +1,8 @@
+earliest=@d latest=now index=* sourcetype=*
+| eval diff_secs=_indextime-_time
+| eval diff_hours=round(diff_secs/3600, 2)
+| eval Relativity=case(diff_hours<-.05,"Future",diff_hours>=0.5,"Past")
+| stats values(Relativity) as Relativity avg(eval(abs(diff_hours))) as AvgAbsDiff max(eval(abs(diff_hours))) as MaxDiff by sourcetype host
+| sort - AvgAbsDiff
+| eval AvgAbsDiff=round(AvgAbsDiff, 2)
+| rename AvgAbsDiff as "Avg Absolute Difference", MaxDiff as "Max Difference"
