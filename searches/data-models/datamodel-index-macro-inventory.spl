@@ -1,0 +1,10 @@
+| rest /services/datamodel/model
+| table title "eai:acl.app" *whitelist*
+| join title [
+    | rest /services/admin/macros
+    | search title="cim_*_indexes"
+    | table title definition "eai:acl.app"
+    | rename title as Macro_Name, definition as Definition
+    | rex field=Macro_Name "cim_(?<title>[^\s]+)_indexes"
+]
+| rex field=Definition mode=sed "s/[\(\)]//g"

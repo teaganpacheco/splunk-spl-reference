@@ -1,0 +1,7 @@
+| rest splunk_server=local count=0 /servicesNS/-/-/saved/searches
+| where match('action.correlationsearch.enabled',"1|[Tt]|[Tt][Rr][Uu][Ee]")
+| rename title as search_name, eai:acl.app as app, action.correlationsearch.annotations as frameworks
+| table search_name app description frameworks disabled
+| spath input=frameworks
+| rename mitre_attack{} as mitre_attack, nist{} as nist, cis20{} as cis20, kill_chain_phases{} as kill_chain_phases
+| table app search_name description disabled cis20 kill_chain_phases nist mitre_attack

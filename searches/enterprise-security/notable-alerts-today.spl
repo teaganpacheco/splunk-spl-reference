@@ -1,0 +1,4 @@
+earliest=@d latest=now `notable`
+| search NOT suppression=* NOT severity=informational
+| timechart count span=1h@h
+| addcoltotals labelfield=total label="Total Alerts Today"

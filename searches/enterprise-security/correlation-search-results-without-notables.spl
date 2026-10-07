@@ -1,0 +1,21 @@
+earliest=@d latest=now index=_audit action=search provenance=scheduler info=completed
+| search search="*| tstats*"
+| rename savedsearch_name as correlation_search
+| stats sum(event_count) as result_rows count as run_count latest(_time) as last_run values(search) as example_search by correlation_search
+| eval last_run=strftime(last_run,"%Y-%m-%d %H:%M:%S")
+| join correlation_search type=inner [
+    | rest /servicesNS/-/-/saved/searches splunk_server=local count=0
+    | where disabled=0 AND match('action.correlationsearch.enabled',"(?i)^(1|true)$")
+    | rename title as correlation_search, eai:acl.app as app
+    | eval notable_action=if(match(actions,"(^|,)notable(,|$)"),1,0)
+    | fields correlation_search app notable_action actions
+]
+| join correlation_search type=left [
+    search earliest=@d latest=now index=notable
+    | stats count as notable_count latest(_time) as last_notable by rule_name
+    | rename rule_name as correlation_search
+]
+| eval notable_count=coalesce(notable_count,0)
+| where notable_action=1 AND result_rows>0 AND notable_count=0
+| sort - result_rows
+| table correlation_search app run_count last_run result_rows notable_count actions example_search

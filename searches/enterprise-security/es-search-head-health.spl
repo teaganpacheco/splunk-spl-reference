@@ -1,0 +1,10 @@
+| rest splunk_server=local /services/server/info
+| eval server_health=case(health_info=="green","true",health_info=="red","false",true(),"unknown")
+| eval forwarding_health=if(isForwarding==1,"true","false")
+| eval license_health=if(licenseState=="OK","true","false")
+| convert ctime(startup_time) as last_started_at
+| rename guid as server_guid, serverName as server_name, version as server_version
+| table server_name server_guid server_version server_health forwarding_health license_health
+| appendcols [| rest splunk_server=local /services/server/introspection/kvstore/serverstatus | stats count | eval kvstore_server_health=if(count=0,"false","true") | fields - count]
+| appendcols [| rest splunk_server=local /services/server/introspection/kvstore/replicasetstats | stats count | eval kvstore_replica_health=if(count=0,"false","true") | fields - count]
+| appendcols [| rest splunk_server=local /services/server/introspection/kvstore/collectionstats | stats count | eval kvstore_collection_health=if(count=0,"false","true") | fields - count]

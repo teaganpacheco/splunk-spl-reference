@@ -1,0 +1,4 @@
+| rest splunk_server=local count=0 /servicesNS/-/-/saved/searches
+| where match('action.correlationsearch.enabled',"1|[Tt]|[Tt][Rr][Uu][Ee]") AND disabled=0
+| table title eai:acl.app cron_schedule schedule_window schedule_priority
+| rename title as "Correlation Search", eai:acl.app as App, cron_schedule as "Cron Schedule", schedule_window as "Schedule Window", schedule_priority as "Schedule Priority"

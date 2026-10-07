@@ -1,0 +1,5 @@
+| rest splunk_server=local count=0 /services/saved/searches
+| rename eai:acl.app as app, title as csearch_name, action.correlationsearch.label as csearch_label, action.notable.param.security_domain as security_domain, triggered_alert_count as number_of_alerts
+| search app="SplunkEnterpriseSecuritySuite"
+| table number_of_alerts csearch_label app security_domain description
+| sort - number_of_alerts

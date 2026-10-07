@@ -1,0 +1,5 @@
+earliest=-3d@d latest=-2d@d index=notable
+| eval notable_source=coalesce(rule_name,search_name,savedsearch_name,correlation_search_name,source)
+| search notable_source!=""
+| stats count as notable_count by notable_source
+| sort - notable_count

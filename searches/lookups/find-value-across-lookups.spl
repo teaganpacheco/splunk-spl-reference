@@ -1,0 +1,8 @@
+| rest splunk_server=local /servicesNS/-/-/data/lookup-table-files f=title
+| fields title
+| dedup title
+| map maxsearches=1000 search="| inputlookup $title$ | fieldsummary | eval lookup_name=$title$ | fields values field lookup_name"
+| spath input=values
+| rename {}.* as *
+| fields lookup_name field value
+| search value="<value>"

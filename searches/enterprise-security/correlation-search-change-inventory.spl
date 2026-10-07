@@ -1,0 +1,5 @@
+| rest splunk_server=local count=0 /servicesNS/-/-/saved/searches
+| where match('action.correlationsearch.enabled',"1|[Tt]|[Tt][Rr][Uu][Ee]")
+| where disabled=0
+| eval actions=split(actions,",")
+| fields title search updated

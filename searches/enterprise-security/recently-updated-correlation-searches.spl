@@ -1,0 +1,7 @@
+| rest splunk_server=local count=0 /services/saved/searches
+| where match('action.correlationsearch.enabled',"1|[Tt]|[Tt][Rr][Uu][Ee]")
+| rename action.correlationsearch.label as Alert_Name, action.correlationsearch.annotations as frameworks, updated as Last_Updated
+| table Alert_Name frameworks disabled Last_Updated
+| spath input=frameworks
+| table Alert_Name disabled Last_Updated
+| sort - Last_Updated
