@@ -1,0 +1,7 @@
+earliest=@week latest=now index=security_okta sourcetype="OktaIM2:log" ip="<ip_address>" action=success http_user_agent!="Okta Verify*" target_app=*
+| cluster t=0.4 showcount=t field=http_user_agent
+| rename authenticationProvider as authProvider, authenticationContext.credentialProvider as credProvider, externalSessionId as SessionId
+| lookup local=t asn ip OUTPUTNEW autonomous_system
+| stats first(_time) as Time values(*) as * count by SessionId
+| eval Time=strftime(Time,"%m/%d/%Y %H:%M")
+| table Time action app target_app actor_type user client_device client_os client_browser cluster_* http_user_agent src_ip client_country client_state autonomous_system ip ip_country ip_state ip_city

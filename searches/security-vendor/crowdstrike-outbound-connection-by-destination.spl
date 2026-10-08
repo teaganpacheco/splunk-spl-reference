@@ -1,0 +1,6 @@
+earliest=@week latest=now index=edr* sourcetype=`cs` event_simpleName=NetworkConnect* direction=outbound aid IN(*) AND (dest_port IN(21,22,25,80,443,3389) OR TERM("<dest_ip>"))
+| rename falcon_process_id as process_id
+| eval falcon_process_explorer_url="https://falcon.us-2.crowdstrike.com/investigate/process-explorer/".aid."/".process_id."?_cid=".cid
+| table _time aid src_ip process_id dest_ip dest_port falcon_process_explorer_url
+| stats values(*) as *, min(_time) as first_time, max(_time) as last_time, count by dest_ip dest_port
+| `format_times("first_time last_time")`

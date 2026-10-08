@@ -1,0 +1,1 @@
+earliest=@week latest=now index=edr* sourcetype=crowdstrike:fdr:data:SQS:json aid=* SHA256HashData=* CommandLine=* falcon_process_id=*

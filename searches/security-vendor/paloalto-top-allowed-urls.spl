@@ -1,0 +1,5 @@
+earliest=-1h@h latest=@h index=sec_fw* sourcetype=pan:threat action=allowed url=*
+| stats count by url
+| sort - count
+| eval count=tostring(count,"commas")
+| head 20

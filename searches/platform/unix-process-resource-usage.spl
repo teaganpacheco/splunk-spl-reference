@@ -1,0 +1,3 @@
+earliest=@d latest=now index=unix_os sourcetype=ps host=<host>
+| stats latest(pctCPU) as cpu, latest(pctMEM) as mem by COMMAND
+| sort - cpu
