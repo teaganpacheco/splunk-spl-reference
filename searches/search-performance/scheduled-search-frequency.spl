@@ -1,0 +1,8 @@
+| rest /servicesNS/-/-/saved/searches splunk_server=local search="is_scheduled=1" search="disabled=0"
+| fields title eai:acl.app eai:acl.owner cron_schedule dispatch.earliest_time dispatch.latest_time schedule_window actions
+| rename title as Report_Name, cron_schedule as Cron_Schedule
+| eval Frequency=if(like(Cron_Schedule,"/1 %"),"1min",if(like(Cron_Schedule," * * * "),"1min",if(like(Cron_Schedule,"%/5 %"),"5min",if(like(Cron_Schedule,"%/10 %"),"10min",if(like(Cron_Schedule,"/15 %"),"15min",if(like(Cron_Schedule,"0 %"),"Top of the Hour","other"))))))
+| stats count(Report_Name) AS Search_Count values(Report_Name) AS Search_Names values(Cron_Schedule) AS Cron by Frequency
+| addcoltotals labelfield=Frequency label="Total Searches Scheduled"
+| sort Search_Count
+| table Frequency Search_Count Search_Names Cron

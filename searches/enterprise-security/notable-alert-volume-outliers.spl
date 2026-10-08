@@ -1,0 +1,19 @@
+earliest=-15d@d latest=@d `notable`
+| bin _time span=1d
+| stats count(eval(isnull(suppression))) as daily_alerts count(eval(isnotnull(suppression))) as suppressed_alerts by _time
+| eval day_of_week=strftime(_time,"%A")
+| streamstats window=14 current=t avg(daily_alerts) as rolling_avg, stdev(daily_alerts) as rolling_stdev, avg(suppressed_alerts) as rolling_suppressed_alerts_avg, stdev(suppressed_alerts) as rolling_suppressed_alerts_stdev
+| fillnull value=0 rolling_stdev
+| eval upper_bound=round(rolling_avg+(2*rolling_stdev),0)
+| eval lower_bound=round(rolling_avg-(2*rolling_stdev),0)
+| eval rolling_avg=round(rolling_avg,0), rolling_stdev=round(rolling_stdev,2)
+| eval z_score=abs((daily_alerts-rolling_avg)/rolling_stdev)
+| eval suppression_upper_bound=round(rolling_suppressed_alerts_avg+(2*rolling_suppressed_alerts_stdev),0)
+| eval suppression_lower_bound=round(rolling_suppressed_alerts_avg-(2*rolling_suppressed_alerts_stdev),0)
+| eval rolling_suppressed_alerts_avg=round(rolling_suppressed_alerts_avg,0), rolling_suppressed_alerts_stdev=round(rolling_suppressed_alerts_stdev,2)
+| eval suppression_z_score=abs((suppressed_alerts-rolling_suppressed_alerts_avg)/rolling_suppressed_alerts_stdev)
+| eval is_outlier=case((day_of_week=="Saturday" OR day_of_week=="Sunday") AND (daily_alerts>upper_bound OR daily_alerts<lower_bound) AND z_score>=2,1,(day_of_week!="Saturday" AND day_of_week!="Sunday") AND (daily_alerts>upper_bound OR daily_alerts<lower_bound) AND z_score>=2,1,1=1,0)
+| eval suppression_is_outlier=case((day_of_week=="Saturday" OR day_of_week=="Sunday") AND (suppressed_alerts>suppression_upper_bound OR suppressed_alerts<suppression_lower_bound) AND z_score>=1,1,(day_of_week!="Saturday" AND day_of_week!="Sunday") AND (suppressed_alerts>suppression_upper_bound OR suppressed_alerts<suppression_lower_bound) AND z_score>=1,1,1=1,0)
+| sort - _time
+| eval _time=strftime(_time,"%m/%d/%Y")
+| table _time day_of_week daily_alerts rolling_avg rolling_stdev upper_bound lower_bound z_score is_outlier suppressed_alerts rolling_suppressed_alerts_avg rolling_suppressed_alerts_stdev suppression_upper_bound suppression_lower_bound suppression_z_score suppression_is_outlier

@@ -1,0 +1,20 @@
+| rest count=0 splunk_server=local /servicesNS/-/-/data/ui/views
+| rename eai:appName AS appContext, label AS humanDashboardName, updated AS dashboardUpdated, "eai:acl.owner" AS owner
+| eval urlDashboardName=urldecode(replace(id,"^.*/",""))
+| eval appContext=lower(appContext), urlDashboardName=lower(urlDashboardName)
+| eval inventory_record=1
+| fields appContext urlDashboardName humanDashboardName dashboardUpdated owner inventory_record
+| append [
+    search earliest=0 latest=now index=_internal sourcetype=splunk_web_access method=GET (uri_path="/en-US/app/" OR uri_path="/en-GB/app/") app=* view=*
+    | eval appContext=lower(app), urlDashboardName=lower(view)
+    | stats latest(_time) AS last_viewed_epoch count AS total_views dc(user) AS unique_viewers values(user) AS viewers by appContext urlDashboardName
+]
+| stats max(inventory_record) AS inventory_record values(humanDashboardName) AS humanDashboardName values(dashboardUpdated) AS dashboardUpdated values(owner) AS owner max(last_viewed_epoch) AS last_viewed_epoch sum(total_views) AS total_views max(unique_viewers) AS unique_viewers values(viewers) AS viewers by appContext urlDashboardName
+| where inventory_record=1 AND (isnull(last_viewed_epoch) OR last_viewed_epoch<relative_time(now(),"-30d@d"))
+| eval humanDashboardName=coalesce(mvindex(humanDashboardName,0),urlDashboardName)
+| eval usage_status=case(isnull(last_viewed_epoch),"No recorded views",last_viewed_epoch<relative_time(now(),"-90d@d"),"Not viewed in 90+ days",true(),"Not viewed in 30+ days")
+| eval days_since_viewed=if(isnull(last_viewed_epoch),null(),floor((now()-last_viewed_epoch)/86400))
+| eval last_viewed=if(isnull(last_viewed_epoch),"No view in retained history",strftime(last_viewed_epoch,"%Y-%m-%d %H:%M:%S"))
+| eval total_views=coalesce(total_views,0), unique_viewers=coalesce(unique_viewers,0)
+| table appContext humanDashboardName urlDashboardName owner usage_status last_viewed days_since_viewed total_views unique_viewers viewers dashboardUpdated
+| sort 0 appContext -days_since_viewed humanDashboardName

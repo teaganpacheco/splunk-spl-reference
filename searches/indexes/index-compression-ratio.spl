@@ -1,0 +1,6 @@
+| dbinspect index=<index>
+| stats sum(rawSize) AS rawTotal, sum(sizeOnDiskMB) AS diskTotalinMB
+| eval rawTotalinMB=(rawTotal/1024/1024)
+| eval compression_ratio=round(rawTotalinMB/diskTotalinMB,2)
+| eval savings_percent=round((1-(diskTotalinMB/rawTotalinMB))*100,2)
+| table rawTotalinMB diskTotalinMB compression_ratio savings_percent

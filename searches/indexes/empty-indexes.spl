@@ -1,0 +1,4 @@
+| eventcount summarize=false index=*
+| dedup index
+| where count=0
+| sort index

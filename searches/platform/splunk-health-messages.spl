@@ -1,0 +1,4 @@
+| rest splunk_server=local /services/messages
+| search eai:acl.app=* author=*
+| table title message severity timeCreated_iso
+| sort - timeCreated_iso

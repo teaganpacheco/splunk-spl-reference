@@ -1,0 +1,7 @@
+earliest=@d latest=now index=_introspection sourcetype=splunk_resource_usage component=Hostwide host=<host>
+| eval mem_total=tonumber('data.mem')
+| eval mem_used=tonumber('data.mem_used')
+| where isnotnull(mem_total) AND mem_total>0 AND isnotnull(mem_used)
+| eval Memory_Usage=(mem_used/mem_total)*100
+| timechart span=5m avg(Memory_Usage) by host useother=false limit=20
+| foreach * [eval <<FIELD>>=round('<<FIELD>>',2)]
