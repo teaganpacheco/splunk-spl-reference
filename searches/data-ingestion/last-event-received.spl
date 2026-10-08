@@ -1,0 +1,2 @@
+| tstats latest(_time) as LastSeen where earliest=@mon latest=now index=* sourcetype=* host=*
+| eval LastSeen=strftime(LastSeen,"%Y-%m-%d %H:%M:%S")

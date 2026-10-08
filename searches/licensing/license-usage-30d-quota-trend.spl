@@ -1,0 +1,7 @@
+earliest=-30d@d latest=now index=_internal source=*license_usage.log type=Usage pool=* host=<license_manager>
+| timechart span=1d sum(b) AS daily_used_bytes
+| eval "Daily License Quota Used"=round(daily_used_bytes/1024/1024/1024,3)
+| eval Quota_GB=<quota_gb>
+| trendline sma7("Daily License Quota Used") AS Trendline
+| eval Trendline=round(Trendline,3)
+| fields _time "Daily License Quota Used" Trendline Quota_GB

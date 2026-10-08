@@ -1,0 +1,6 @@
+earliest=-30d@d latest=@d index=_internal source=*license_usage.log type="RolloverSummary"
+| timechart span=1d sum(b) AS License_Usage_Bytes
+| eval License_Usage_GB=round(License_Usage_Bytes/1024/1024/1024,2)
+| eventstats avg(License_Usage_GB) as Avg_30d_GB
+| eval Avg_30d_GB=round(Avg_30d_GB,2)
+| fields _time License_Usage_GB Avg_30d_GB

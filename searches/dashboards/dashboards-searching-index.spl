@@ -1,0 +1,6 @@
+| rest /servicesNS/-/-/data/ui/views
+| search isDashboard=1 isVisible=1
+| rename title as dashboard_name, eai:data as dashboard_xml, eai:appName as app_name
+| eval match_index=if(match(dashboard_xml,"(?i)index\s*=\s*\"?<index>\"?"),1,0)
+| where match_index=1
+| table app_name dashboard_name author updated

@@ -1,0 +1,6 @@
+earliest=@d latest=now index=_introspection sourcetype=splunk_resource_usage component=Hostwide host=<host>
+| eval cpu_idle=tonumber('data.cpu_idle_pct')
+| where isnotnull(cpu_idle)
+| eval CPU_Usage=100-cpu_idle
+| timechart span=5m avg(CPU_Usage) by host useother=false limit=20
+| foreach * [eval <<FIELD>>=round('<<FIELD>>',2)]

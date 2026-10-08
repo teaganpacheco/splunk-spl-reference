@@ -1,0 +1,3 @@
+earliest=-1d@d latest=@d index=_audit action=search search="*<sourcetype>*" NOT search="_audit*"
+| stats count as Search_Count latest(_time) as Last_Searched by user search
+| convert ctime(Last_Searched)

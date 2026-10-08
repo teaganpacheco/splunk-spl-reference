@@ -1,0 +1,11 @@
+| dbinspect index=*
+| eval age=tostring(now()-endEpoch,"duration")
+| eval start=strftime(startEpoch,"%Y-%m-%d %H:%M:%S")
+| eval end=strftime(endEpoch,"%Y-%m-%d %H:%M:%S")
+| eval year_ago_epoch=relative_time(now(),"-1y")
+| where endEpoch<year_ago_epoch
+| eval year_ago=strftime(year_ago_epoch,"%Y-%m-%d %H:%M:%S")
+| streamstats sum(sizeOnDiskMB) as oldEventsSizeMB
+| eval oldEventsSizeMB=round(oldEventsSizeMB,2)
+| table index id state splunk_server eventCount sizeOnDiskMB modTime startEpoch start endEpoch end age oldEventsSizeMB year_ago year_ago_epoch
+| sort + end

@@ -1,0 +1,8 @@
+earliest=-1h@h latest=now index=_introspection sourcetype IN (splunk_disk_objects,splunk_resource_usage) component IN (Hostwide,DiskObjects,Partitions)
+| eval cpu_usage_pct=if(component=="Hostwide" AND isnotnull('data.cpu_idle_pct'),round(100-tonumber('data.cpu_idle_pct'),2),null()), mem_usage_pct=if(component=="Hostwide" AND tonumber('data.mem')>0,round((tonumber('data.mem_used')/tonumber('data.mem'))*100,2),null()), capacity_mb=if(isnotnull('data.capacity'),tonumber('data.capacity'),null()), free_mb=if(isnotnull('data.free'),tonumber('data.free'),null()), mount_point='data.mount_point', fs_type='data.fs_type'
+| eval used_mb=if(isnotnull(capacity_mb) AND capacity_mb>0,capacity_mb-free_mb,null()), disk_usage_pct=if(isnotnull(capacity_mb) AND capacity_mb>0,round((used_mb/capacity_mb)*100,2),null())
+| eventstats latest(cpu_usage_pct) as CPU_Usage_pct latest(mem_usage_pct) as Mem_Usage_pct by host
+| where isnotnull(disk_usage_pct)
+| stats latest(CPU_Usage_pct) as CPU_Usage_pct, latest(Mem_Usage_pct) as Mem_Usage_pct, latest(disk_usage_pct) as Disk_Usage_pct, latest(used_mb) as used_mb, latest(free_mb) as free_mb, latest(capacity_mb) as capacity_mb by host mount_point fs_type
+| rename host as "Splunk Instance", mount_point as "Mount Point", fs_type as "FS Type"
+| sort 0 "Splunk Instance" "Mount Point"

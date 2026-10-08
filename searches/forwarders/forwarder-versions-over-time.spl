@@ -1,0 +1,9 @@
+earliest=-8d@d latest=@d index=_internal source=*metrics.log group=tcpin_connections
+| eval sourceHost=coalesce(hostname,sourceHost)
+| where (fwdType=="uf" OR fwdType=="full") AND isnotnull(sourceHost)
+| eval version_bucket=case(like(version,"9.2.%"),"9.2.",like(version,"9.4.%"),"9.4.",like(version,"10.%"),"10.",true(),null())
+| where isnotnull(version_bucket)
+| eval day_bucket=relative_time(_time,"@d")
+| stats latest(version_bucket) as version_bucket by day_bucket sourceHost
+| rename day_bucket as _time
+| timechart span=1d dc(sourceHost) by version_bucket useother=f
