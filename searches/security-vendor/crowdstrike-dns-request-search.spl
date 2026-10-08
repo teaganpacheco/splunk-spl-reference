@@ -1,0 +1,4 @@
+earliest=@d latest=now index=edr* sourcetype=crowdstrike:fdr:data:SQS:json event_simpleName=DnsRequest aid=* TERM("<url_domain>")
+| sort _time
+| table _time DomainName
+| stats list(*) as * by _time

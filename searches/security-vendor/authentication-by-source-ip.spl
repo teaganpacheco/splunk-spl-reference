@@ -1,0 +1,9 @@
+earliest=@week latest=now ((index=*okta) OR (index=azure* "properties.incomingTokenType"!=primaryRefreshToken))
+| rename properties.appDisplayName as app, properties.location.countryOrRegion as request.ipChain{}.geographicalContext.country
+| rename request.ipChain{}.geographicalContext.country as country
+| search src_ip="<src_ip>"
+| table _time index user user_email src_ip app action country
+| fillnull value=NULL
+| stats earliest(_time) as first_time latest(_time) as last_time values(*) as * count by user src_ip
+| `format_times("first_time last_time")`
+| sort last_time

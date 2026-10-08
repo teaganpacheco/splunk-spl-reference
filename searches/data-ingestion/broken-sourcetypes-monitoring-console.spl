@@ -1,0 +1,16 @@
+index=_internal source=*splunkd.log* (log_level=ERROR OR log_level=WARN) (component=AggregatorMiningProcessor OR component=DateParserVerbose OR component=LineBreakingProcessor)
+| rex field=_raw "Context: source(::|=)(?<context_source>[^\|]*?)\|host(::|=)(?<context_host>[^\|]*?)\|(?<context_sourcetype>[^\|]*?)\|"
+| eval data_source=if(isnull(data_source) AND isnotnull(context_source),context_source,data_source), Sourcetype=if(isnull(Sourcetype) AND isnotnull(context_sourcetype),context_sourcetype,Sourcetype)
+| search NOT Sourcetype=http_event_collector_metrics NOT Sourcetype=kvstore NOT Sourcetype=mongod NOT Sourcetype=splunk_* NOT Sourcetype=splunkd NOT Sourcetype=splunkd_*
+| eval issue=case(
+    like(event_message,"Truncating line because limit of %"),"Truncating line because limit of characters limit",
+    like(event_message,"Failed to parse timestamp in first MAX_TIMESTAMP_LOOKAHEAD%"),"Failed to parse timestamp in first MAX_TIMESTAMP_LOOKAHEAD",
+    like(event_message,"Breaking event because limit of %"),"Breaking event because of limit",
+    like(event_message,"The TIME_FORMAT specified is matching timestamps%"),"The TIME_FORMAT specified is not matching with the event",
+    like(event_message,"A possible timestamp match%"),"A possible timestamp match is outside of the acceptable time window",
+    like(event_message,"Changing breaking behavior for event stream because%"),"Changing breaking behavior for event stream because MAX_EVENTS was exceeded without a single event break",
+    like(event_message,"Accepted time % is suspiciously far away from the previous event%"),"Accepted time is suspiciously far away from the previous event",
+    like(event_message,"Time parsed % is too far away from the previous%"),"Time parsed is too far away from the previous event's time",
+    like(event_message,"Accepted time format has changed %"),"Accepted time format has changed"
+)
+| stats values(issue) as Issues by Sourcetype

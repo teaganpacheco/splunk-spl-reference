@@ -1,0 +1,4 @@
+earliest=-4mon@mon latest=now index=unix_os sourcetype=df host=<indexer> mount="/data"
+| eval Avail=rtrim(replace(Avail,"T",""))
+| timechart avg(Avail) as AvgAvail span=5d@d
+| eval AvgAvail=round(AvgAvail,2)

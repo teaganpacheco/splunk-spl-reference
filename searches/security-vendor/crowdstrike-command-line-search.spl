@@ -1,0 +1,4 @@
+earliest=@week latest=now index=edr* sourcetype=crowdstrike:fdr:data:SQS:json event_simpleName IN (ProcessRollup2,SyntheticProcessRollup2) event_platform IN (Win,Lin,Mac) aid=* CommandLine="*<command>*"
+| fields _time TargetProcessId ParentBaseFileName ImageFileName CommandLine
+| stats list(TargetProcessId) as process_id, list(ParentBaseFileName) as parent_process, list(ImageFileName) as process_name, list(CommandLine) as command_line, list(falcon_process_id) as Process_id by _time
+| sort - _time

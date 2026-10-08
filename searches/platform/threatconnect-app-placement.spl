@@ -1,0 +1,10 @@
+index="_introspection" "data.process"=python* earliest=-4h
+| stats count by host
+| fields host
+| join type=left host [
+    search index="_internal" sourcetype="*threatconnect*" OR (sourcetype IN ("splunkd","scheduler") AND app="*threatconnect*") earliest=-1h
+    | stats values(app) as apps, count as count by host
+    | fields host count apps
+]
+| fillnull count value="0"
+| where isnotnull(apps)
